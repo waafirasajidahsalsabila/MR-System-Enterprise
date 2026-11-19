@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR System Enterprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --sidebar-bg: #3E2723;
+            --sidebar-hover: #5D4037;
+            --primary-brown: #8D6E63;
+            --dark-brown: #5D4037;
+            --light-bg: #FDFBF7;
+            --card-bg: #FFFFFF;
+            --text-main: #3E2723;
+            --text-muted: #795548;
+            --border-color: #EFEBE9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            left: 0; top: 0; z-index: 100;
+        }
+
+        .brand {
+            padding: 25px 20px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .nav-menu { list-style: none; padding: 15px 0; flex-grow: 1; }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 12px;
+            font-size: 0.95rem; color: #BCAAA4;
+        }
+
+        .nav-item:hover { background-color: var(--sidebar-hover); color: white; }
+
+        .nav-item.active {
+            background-color: var(--primary-brown);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .nav-section-title {
+            padding: 15px 20px 5px;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
+            color: #8D6E63; font-weight: 600;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            flex-grow: 1;
+            padding: 30px;
+            width: calc(100% - 260px);
+        }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 { font-size: 1.6rem; color: var(--dark-brown); font-weight: 600; }
+        .page-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+
+        .btn {
+            padding: 10px 20px; border-radius: 6px; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; border: none;
+            font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-brown), var(--dark-brown));
+            color: white; box-shadow: 0 2px 5px rgba(93, 64, 55, 0.2);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(93, 64, 55, 0.3); }
+
+        .tabs-container {
+            background: white; border-radius: 8px 8px 0 0;
+            padding: 0 20px; border-bottom: 1px solid var(--border-color);
+            display: flex; gap: 20px;
+        }
+
+        .tab {
+            padding: 15px 5px; cursor: pointer; color: var(--text-muted);
+            font-weight: 500; position: relative; transition: color 0.2s;
+        }
+        .tab:hover { color: var(--primary-brown); }
+        .tab.active { color: var(--dark-brown); font-weight: 600; }
+        .tab.active::after {
+            content: ''; position: absolute; bottom: -1px; left: 0;
+            width: 100%; height: 3px; background-color: var(--primary-brown);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .data-card {
+            background: white; border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;
+            border: 1px solid var(--border-color); border-top: none;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background-color: #FAF9F6; color: var(--text-muted);
+            padding: 15px 20px; text-align: left; font-weight: 600;
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 20px; border-bottom: 1px solid #F5F5F5;
+            font-size: 0.95rem; color: var(--text-main);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background-color: #FFF8E1; }
+
+        .badge {
+            padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;
+        }
+        .bg-urgent { background: #FFEBEE; color: #C62828; }
+        .bg-high { background: #FFF3E0; color: #E65100; }
+        .bg-medium { background: #E3F2FD; color: #1565C0; }
+        .bg-low { background: #E8F5E9; color: #2E7D32; }
+
+        .pagination-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; background: #FAFAFA; border-top: 1px solid var(--border-color);
+            flex-wrap: wrap; gap: 15px;
+        }
+        .page-info { font-weight: 500; color: var(--text-muted); font-size: 0.9rem; }
+
+        .btn-nav {
+            background: transparent; border: 1px solid var(--border-color);
+            color: var(--primary-brown); padding: 6px 12px; border-radius: 4px;
+            cursor: pointer; font-size: 0.85rem;
+        }
+        .btn-nav:hover:not(:disabled) { background: var(--primary-brown); color: white; }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-page-active {
+            background: var(--primary-brown) !important;
+            color: white !important;
+            border-color: var(--primary-brown) !important;
+            font-weight: bold;
+        }
+
+        #loading { text-align: center; padding: 40px; color: var(--primary-brown); font-style: italic; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(62, 39, 35, 0.5); backdrop-filter: blur(3px);
+            display: none; z-index: 1000; animation: fadeIn 0.3s ease;
+        }
+        .modal-box {
+            background: white; width: 90%; max-width: 500px; margin: 5vh auto;
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px; position: relative; animation: slideUp 0.3s ease;
+        }
+        .modal-large { max-width: 700px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; font-size: 24px;
+            color: #999; cursor: pointer; transition: color 0.2s;
+        }
+        .close-modal:hover { color: var(--dark-brown); }
+
+        .form-title {
+            color: var(--dark-brown); margin-bottom: 20px; font-size: 1.4rem;
+            font-weight: 600; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-muted); font-size: 0.9rem; }
+        input, select {
+            width: 100%; padding: 12px 15px; border: 1px solid #DDD;
+            border-radius: 6px; font-family: inherit; font-size: 0.95rem;
+            transition: all 0.3s; background: #FCFCFC;
+        }
+        input:focus, select:focus {
+            outline: none; border-color: var(--primary-brown);
+            background: white; box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.1);
+        }
+        .error-text { color: #C62828; font-size: 0.8rem; margin-top: 5px; display: none; font-weight: 500; }
+        .has-error input, .has-error select { border-color: #C62828 !important; background: #FFEBEE !important; }
+        .submit-btn { width: 100%; margin-top: 10px; padding: 14px; font-size: 1rem; }
+
+        .detail-table th { background: #EFEFEF; padding: 8px; font-size: 0.85rem; }
+        .detail-table td { padding: 8px; font-size: 0.9rem; border-bottom: 1px solid #eee; }
+        .detail-total-row { background: #FFF8E1; font-weight: bold; }
+
+        .placeholder-content {
+            text-align: center; padding: 60px 20px; color: var(--text-muted);
+        }
+        .placeholder-icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+
+        .btn-delete-small {
+            background: transparent; border: 1px solid #FFCDD2; color: #C62828;
+            padding: 2px 6px; font-size: 0.7rem; border-radius: 4px; cursor: pointer;
+        }
+        .btn-delete-small:hover { background: #FFEBEE; }
+
+        .search-wrapper {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #DDD;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.3s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-brown);
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .rows-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .rows-selector select {
+            width: auto;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #DDD;
+            font-family: 'Poppins';
+            cursor: pointer;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="brand">🏥 MR SYSTEM</div>
+
+    <div class="nav-section-title">Main Menu</div>
+    <ul class="nav-menu">
+        <li class="nav-item active" onclick="switchModule('pengajuan')">
+            📋 Pengajuan MR
+        </li>
+        <li class="nav-item" onclick="switchModule('inventory')">
+            📦 Inventory Barang
+        </li>
+        <li class="nav-item" onclick="switchModule('users')">
+            👥 Daftar Pemohon
+        </li>
+    </ul>
+
+    <div class="nav-section-title">Reports</div>
+    <ul class="nav-menu">
+        <li class="nav-item" onclick="switchModule('statistik')">
+            📊 Statistik Bulanan
+        </li>
+        <li class="nav-item" onclick="switchModule('arsip')">
+            🗑️ Arsip Dokumen
+        </li>
+    </ul>
+</aside>
+
+<main class="main-content">
+    <div id="dynamicContentArea"></div>
+</main>
+
+<div id="addModal" class="modal-overlay">
+    <div class="modal-box">
+        <span class="close-modal" onclick="closeAddModal()">&times;</span>
+        <h2 class="form-title">Formulir Pengajuan Baru</h2>
+        <form id="pengajuanForm" onsubmit="handleSave(event)">
+            <div class="input-group" id="group-noMr">
+                <label>No MR Document</label>
+                <input type="text" id="noMr" placeholder="Contoh: DOC-NEW-001">
+                <div class="error-text" id="err-noMr"></div>
+            </div>
+            <div class="input-group" id="group-pemohon">
+                <label>Nama Pemohon</label>
+                <input type="text" id="pemohon" placeholder="Nama Lengkap">
+                <div class="error-text" id="err-pemohon"></div>
+            </div>
+            <div class="input-group" id="group-departemen">
+                <label>Departemen</label>
+                <input type="text" id="departemen" placeholder="Divisi/Tim">
+                <div class="error-text" id="err-departemen"></div>
+            </div>
+            <div class="input-group" id="group-prioritas">
+                <label>Prioritas</label>
+                <select id="prioritas">
+                    <option value="">-- Pilih Prioritas --</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="URGENT">URGENT</option>
+                </select>
+                <div class="error-text" id="err-prioritas"></div>
+            </div>
+            <button type="submit" class="btn btn-primary submit-btn">Simpan Data</button>
+        </form>
+    </div>
+</div>
+
+<div id="detailModal" class="modal-overlay">
+    <div class="modal-box modal-large">
+        <span class="close-modal" onclick="closeDetailModal()">&times;</span>
+        <h2 class="form-title">📄 Detail Dokumen MR</h2>
+        <div id="detailContent" style="font-size: 0.9rem; line-height: 1.6;">
+            Memuat detail...
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+    let currentSize = 10;
+    const apiUrl = '/api/pengajuan';
+    let currentModule = 'pengajuan';
+
+    function switchModule(moduleName) {
+        currentModule = moduleName;
+
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        const container = document.getElementById('dynamicContentArea');
+
+        if (moduleName === 'pengajuan') {
+            renderPengajuanView(container);
+            fetchData(0);
+        } else {
+            renderPlaceholderView(container, moduleName);
+        }
+    }
+
+    function renderPengajuanView(container) {
+        container.innerHTML = `
+            <div class="top-bar">
+                <div class="page-title">
+                    <h2>Daftar Pengajuan</h2>
+                    <p>Kelola semua request Medical Record di sini.</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="openAddModal()">+ Buat Pengajuan Baru</button>
+                </div>
+            </div>
+
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="globalSearchInput" class="search-input" placeholder="Cari Nama Pemohon atau No MR..." onkeyup="performGlobalSearch()">
+            </div>
+
+            <div class="tabs-container">
+                <div class="tab active" onclick="filterTable('all')">Semua Data</div>
+                <div class="tab" onclick="filterTable('processing')">Pending Approval</div>
+                <div class="tab" onclick="filterTable('completed')">Completed</div>
+                <div class="tab" onclick="filterTable('rejected')">Rejected</div>
+            </div>
+            <div id="loading">Memuat data...</div>
+            <div class="data-card" id="mainCard" style="display:none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>No MR Document</th>
+                            <th>Pemohon</th>
+                            <th>Departemen</th>
+                            <th>Prioritas</th>
+                            <th>Tanggal Request</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                <div class="pagination-footer">
+                    <div class="rows-selector">
+                        <span>Tampilkan:</span>
+                        <select id="rowsPerPageSelect" onchange="changePageSize(this.value)">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="10000">Semua</option>
+                        </select>
+                    </div>
+
+                    <span class="page-info" id="pageInfo">Halaman 1 dari 1</span>
+
+                    <div style="display:flex; gap:5px; align-items:center;" id="numberPaginationContainer">
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderPlaceholderView(container, moduleName) {
+        const titles = {
+            inventory: "Inventory Barang",
+            users: "Riwayat Pemohon",
+            statistik: "Statistik & Analitik Bulanan",
+            arsip: "Arsip Dokumen Digital"
+        };
+
+        const icons = {
+            inventory: "📦",
+            users: "👥",
+            statistik: "📊",
+            arsip: "🗑️"
+        };
+
+        let contentHtml = '';
+
+        if (moduleName === 'inventory') {
+            contentHtml = `
+                <div class="data-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama Barang</th>
+                                <th>Kategori</th>
+                                <th>Stok Tersedia</th>
+                                <th>Harga Satuan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#001</td>
+                                <td><strong>Laptop Dell Latitude 5420</strong></td>
+                                <td>Elektronik</td>
+                                <td>15 Unit</td>
+                                <td>Rp 18.500.000</td>
+                                <td><span class="badge bg-low">Tersedia</span></td>
+                            </tr>
+                            <tr>
+                                <td>#002</td>
+                                <td><strong>Mouse Wireless Logitech MX Master 3S</strong></td>
+                                <td>Aksesoris</td>
+                                <td>42 Unit</td>
+                                <td>Rp 1.650.000</td>
+                                <td><span class="badge bg-low">Tersedia</span></td>
+                            </tr>
+                            <tr>
+                                <td>#003</td>
+                                <td><strong>Monitor Samsung 27" IPS</strong></td>
+                                <td>Elektronik</td>
+                                <td>8 Unit</td>
+                                <td>Rp 3.200.000</td>
+                                <td><span class="badge bg-high">Menipis</span></td>
+                            </tr>
+                            <tr>
+                                <td>#004</td>
+                                <td><strong>Keyboard Mechanical Keychron K8</strong></td>
+                                <td>Aksesoris</td>
+                                <td>0 Unit</td>
+                                <td>Rp 1.200.000</td>
+                                <td><span class="badge bg-urgent">Habis</span></td>
+                            </tr>
+                            <tr>
+                                <td>#005</td>
+                                <td><strong>Kursi Ergonomis Herman Miller Aeron</strong></td>
+                                <td>Furnitur</td>
+                                <td>3 Unit</td>
+                                <td>Rp 25.000.000</td>
+                                <td><span class="badge bg-medium">Pre-Order</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        else if (moduleName === 'users') {
+            contentHtml = `
+                <div class="data-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Doc</th>
+                                <th>Nama Pemohon</th>
+                                <th>No MR Document</th>
+                                <th>Departemen Asal</th>
+                                <th>Tanggal Request</th>
+                                <th>Status Proses</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#10</td>
+                                <td><strong>Budi Santoso</strong></td>
+                                <td>DOC-DEMO-FINAL</td>
+                                <td>Marketing Division</td>
+                                <td>27/10/2026</td>
+                                <td><span class="badge bg-low">Selesai Diproses</span></td>
+                            </tr>
+                            <tr>
+                                <td>#11</td>
+                                <td><strong>Mbak Virgie</strong></td>
+                                <td>DOC-VIRGIE-REQ-01</td>
+                                <td>Creative Agency</td>
+                                <td>28/10/2026</td>
+                                <td><span class="badge bg-medium">Sedang Review</span></td>
+                            </tr>
+                            <tr>
+                                <td>#12</td>
+                                <td><strong>Nur Aisyah</strong></td>
+                                <td>DOC-NUR-URGENT</td>
+                                <td>HR Department</td>
+                                <td>30/11/2026</td>
+                                <td><span class="badge bg-high">Prioritas Tinggi</span></td>
+                            </tr>
+                            <tr>
+                                <td>#13</td>
+                                <td><strong>Andi Pratama</strong></td>
+                                <td>DOC-ANDI-STANDARD</td>
+                                <td>Finance Team</td>
+                                <td>01/12/2026</td>
+                                <td><span class="badge bg-low">Menunggu Antrian</span></td>
+                            </tr>
+                             <tr>
+                                <td>#14</td>
+                                <td><strong>Siti Rahayu</strong></td>
+                                <td>DOC-SITI-ARCHIVE</td>
+                                <td>Legal Dept</td>
+                                <td>05/12/2026</td>
+                                <td><span class="badge bg-urgent">Rejected (Lengkapi Berkas)</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        else {
+            contentHtml = `
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">${icons[moduleName]}</div>
+                    <h3>Segera Hadir!</h3>
+                    <p>Fitur ${titles[moduleName]} akan tersedia pada rilis berikutnya.</p>
+                    <br>
+                    <button class="btn btn-primary" onclick="alert('Demo Mode: Fitur ${titles[moduleName]} belum terhubung ke Backend.')">Lihat Preview Dummy Data</button>
+                </div>
+            `;
+        }
+
+        container.innerHTML = `
+            <div class="top-bar">
+                <div class="page-title">
+                    <h2>${titles[moduleName]}</h2>
+                    <p>Data simulasi untuk keperluan demonstrasi antarmuka.</p>
+                </div>
+            </div>
+            ${contentHtml}
+        `;
+    }
+
+    async function fetchData(page) {
+        if (currentModule !== 'pengajuan') return;
+
+        const loadingDiv = document.getElementById('loading');
+        const mainCard = document.getElementById('mainCard');
+
+        if(!loadingDiv || !mainCard) return;
+
+        loadingDiv.style.display = 'block';
+        mainCard.style.display = 'none';
+
+        try {
+            const response = await fetch(`${apiUrl}?page=${page}&size=${currentSize}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const data = await response.json();
+
+            renderTable(data.pengajuans);
+            updatePaginationInfo(data.currentPage, data.totalPages);
+
+            loadingDiv.style.display = 'none';
+            mainCard.style.display = 'block';
+
+        } catch (error) {
+            console.error(error);
+            if(loadingDiv) loadingDiv.innerText = '❌ Gagal memuat data.';
+        }
+    }
+
+    function changePageSize(newSizeStr) {
+        currentSize = parseInt(newSizeStr);
+        currentPage = 0;
+        fetchData(0);
+    }
+
+    function renderTable(items) {
+        const tbody = document.getElementById('tableBody');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+
+        if (!items || items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">Tidak ada data ditemukan.</td></tr>';
+            return;
+        }
+
+        items.forEach(item => {
+            const priorityClass = item.prioritas ? `bg-${item.prioritas.toLowerCase()}` : 'bg-low';
+            const dateStr = item.tglRequest ? new Date(item.tglRequest).toLocaleDateString('id-ID') : '-';
+            const statusBadge = item.id % 2 === 0 ? '<span class="badge bg-low">Active</span>' : '<span class="badge bg-medium">Processing</span>';
+
+            const row = `
+                <tr>
+                    <td>#${item.id}</td>
+                    <td><strong>${item.noMr || '-'}</strong></td>
+                    <td>${item.pemohon || '-'}</td>
+                    <td>${item.departemen || '-'}</td>
+                    <td><span class="badge ${priorityClass}">${item.prioritas || '-'}</span></td>
+                    <td>${dateStr}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="btn btn-nav" onclick="viewDetail(${item.id})" style="padding:4px 8px; font-size:0.75rem; cursor:pointer;">👁️ Detail</button>
+                    </td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    function performGlobalSearch() {
+        const query = document.getElementById('globalSearchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#tableBody tr');
+
+        rows.forEach(row => {
+            const cells = row.cells;
+            if(cells.length > 0) {
+                const noMr = cells[1].innerText.toLowerCase();
+                const pemohon = cells[2].innerText.toLowerCase();
+
+                if(noMr.includes(query) || pemohon.includes(query)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            }
+        });
+    }
+
+    function filterTable(statusType) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        const tbody = document.getElementById('tableBody');
+        const rows = tbody.getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const statusCell = row.cells[6];
+            const statusText = statusCell ? statusCell.innerText.toLowerCase() : "";
+
+            let showRow = false;
+
+            if (statusType === 'all') {
+                showRow = true;
+            } else if (statusType === 'processing' && (statusText.includes('processing') || statusText.includes('review'))) {
+                showRow = true;
+            } else if (statusType === 'completed' && (statusText.includes('active') || statusText.includes('selesai'))) {
+                showRow = true;
+            } else if (statusType === 'rejected' && statusText.includes('reject')) {
+                showRow = true;
+            }
+
+            row.style.display = showRow ? "" : "none";
+        }
+    }
+
+    function updatePaginationInfo(current, total) {
+        const infoEl = document.getElementById('pageInfo');
+        const numContainer = document.getElementById('numberPaginationContainer');
+
+        if(infoEl) infoEl.innerText = `Menampilkan Halaman ${current} dari ${total}`;
+
+        if(!numContainer) return;
+
+        numContainer.innerHTML = '';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'btn-nav';
+        prevBtn.innerText = '◄ Prev';
+        prevBtn.disabled = current <= 1;
+        prevBtn.onclick = () => changePage(-1);
+        numContainer.appendChild(prevBtn);
+
+        let startPage = Math.max(1, current - 2);
+        let endPage = Math.min(total, current + 2);
+
+        for(let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = 'btn-nav';
+            if(i === current) {
+                pageBtn.classList.add('btn-page-active');
+            }
+            pageBtn.innerText = i;
+            pageBtn.onclick = () => goToPage(i);
+            numContainer.appendChild(pageBtn);
+        }
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn-nav';
+        nextBtn.innerText = 'Next ►';
+        nextBtn.disabled = current >= total;
+        nextBtn.onclick = () => changePage(1);
+        numContainer.appendChild(nextBtn);
+    }
+
+    function goToPage(pageNumber) {
+        currentPage = pageNumber - 1;
+        fetchData(currentPage);
+    }
+
+    function changePage(delta) {
+        currentPage += delta;
+        if (currentPage < 0) currentPage = 0;
+        fetchData(currentPage);
+    }
+
+    async function viewDetail(id) {
+        const contentDiv = document.getElementById('detailContent');
+        contentDiv.innerHTML = '<p style="color:#8D6E63; text-align:center;">⏳ Mengambil data...</p>';
+        document.getElementById('detailModal').style.display = 'block';
+
+        try {
+            const response = await fetch(`/api/pengajuan/${id}`);
+            if (!response.ok) throw new Error('Data tidak ditemukan');
+
+            const data = await response.json();
+
+            let html = `
+                <div style="background:#FAF9F6; padding:15px; border-radius:6px; margin-bottom:15px; border-left:4px solid var(--primary-brown);">
+                    <h3 style="margin:0 0 10px 0; color:var(--dark-brown);">${data.noMr || '-'}</h3>
+                    <p style="margin:5px 0;"><strong>Pemohon:</strong> ${data.pemohon || '-'}</p>
+                    <p style="margin:5px 0;"><strong>Departemen:</strong> ${data.departemen || '-'}</p>
+                    <p style="margin:5px 0;"><strong>Tanggal:</strong> ${data.tglRequest ? new Date(data.tglRequest).toLocaleDateString('id-ID') : '-'}</p>
+                    <p style="margin:5px 0;"><strong>Prioritas:</strong> <span class="badge bg-${(data.prioritas||'low').toLowerCase()}">${data.prioritas || '-'}</span></p>
+                </div>
+            `;
+
+            if (data.items && Array.isArray(data.items) && data.items.length > 0) {
+                html += `
+                    <h4 style="color:var(--dark-brown); margin-top:20px; border-bottom:1px solid #eee; padding-bottom:5px;">🛒 Daftar Barang Diminta</h4>
+                    <table class="detail-table" style="width:100%; border-collapse:collapse; margin-top:10px;">
+                        <thead>
+                            <tr style="background:#EFEFEF;">
+                                <th style="padding:8px; text-align:left;">Nama Barang</th>
+                                <th style="padding:8px; text-align:center;">Qty</th>
+                                <th style="padding:8px; text-align:right;">Harga Est.</th>
+                                <th style="padding:8px; text-align:right;">Total</th>
+                                <th style="padding:8px; text-align:center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                let grandTotal = 0;
+                data.items.forEach(item => {
+                    const qty = item.jumlah || 0;
+                    const price = item.hargaEstimasi || 0;
+                    const totalItem = qty * price;
+                    grandTotal += totalItem;
+
+                    html += `
+                        <tr style="border-bottom:1px solid #ddd;">
+                            <td style="padding:8px;">${item.namaBarang || 'Unknown Item'}</td>
+                            <td style="padding:8px; text-align:center;">${qty} ${item.satuan || ''}</td>
+                            <td style="padding:8px; text-align:right;">Rp ${price.toLocaleString()}</td>
+                            <td style="padding:8px; text-align:right; font-weight:bold;">Rp ${totalItem.toLocaleString()}</td>
+                            <td style="padding:8px; text-align:center;">
+                                <button onclick="deleteItem(${item.id}, ${id})" class="btn-delete-small">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                        </tbody>
+                        <tfoot>
+                            <tr class="detail-total-row">
+                                <td colspan="3" style="padding:10px; text-align:right;">TOTAL ESTIMASI BIAYA:</td>
+                                <td style="padding:10px; text-align:right; color:#C62828;">Rp ${grandTotal.toLocaleString()}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+            } else {
+                html += '<p style="color:#999; text-align:center; margin-top:20px; background:#FFF3E0; padding:10px; border-radius:4px;">ℹ️ Belum ada item barang terdaftar untuk dokumen ini.</p>';
+            }
+
+            html += `
+                <div style="margin-top:20px; padding:15px; background:#F9F9F9; border-radius:6px; border:1px dashed #CCC;">
+                    <h4 style="color:var(--dark-brown); margin-bottom:10px;">➕ Tambah Barang Baru (Direct Input)</h4>
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="newItemName" placeholder="Nama Barang (Misal: Laptop)" style="flex-grow:1; min-width:200px; padding:8px; font-size:0.9rem;">
+                        <input type="number" id="newItemQty" value="1" style="width:60px; padding:8px; font-size:0.9rem;" title="Jumlah">
+                        <input type="number" id="newItemPrice" placeholder="Harga" style="width:100px; padding:8px; font-size:0.9rem;" title="Harga Satuan">
+                        <button class="btn btn-primary" onclick="addNewItemToDb(${id})" style="padding:8px 15px; font-size:0.85rem;">Simpan Item</button>
+                    </div>
+                </div>
+            `;
+
+            contentDiv.innerHTML = html;
+
+        } catch (error) {
+            console.error("Error Detail:", error);
+            contentDiv.innerHTML = `<p style="color:red; text-align:center;">❌ Gagal memuat detail.<br>Error: ${error.message}</p>`;
+        }
+    }
+
+    async function addNewItemToDb(pengajuanId) {
+        const nameInput = document.getElementById('newItemName');
+        const qtyInput = document.getElementById('newItemQty');
+        const priceInput = document.getElementById('newItemPrice');
+
+        const itemName = nameInput.value.trim();
+        const itemQty = parseInt(qtyInput.value) || 1;
+        const itemPrice = parseFloat(priceInput.value) || 0;
+
+        if (!itemName) {
+            alert("⚠️ Nama barang tidak boleh kosong!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/item/tambah/${pengajuanId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    namaBarang: itemName,
+                    jumlah: itemQty,
+                    satuan: "Unit",
+                    hargaEstimasi: itemPrice
+                })
+            });
+
+            if (!response.ok) throw new Error('Server menolak request');
+
+            alert("✅ Barang berhasil ditambahkan!");
+
+            closeDetailModal();
+            setTimeout(() => viewDetail(pengajuanId), 300);
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ Gagal menyimpan: " + error.message);
+        }
+    }
+
+    async function deleteItem(itemId, pengajuanId) {
+        if(!confirm("Yakin ingin menghapus item ini?")) return;
+
+        try {
+            const response = await fetch(`/api/item/${itemId}`, {
+                method: 'DELETE'
+            });
+
+            if(response.ok) {
+                alert("✅ Item berhasil dihapus!");
+                closeDetailModal();
+                setTimeout(() => viewDetail(pengajuanId), 300);
+            } else {
+                alert("❌ Gagal menghapus item.");
+            }
+        } catch(e) {
+            alert("Error server: " + e.message);
+        }
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'block';
+        clearErrors();
+        document.getElementById('pengajuanForm').reset();
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+        clearErrors();
+    }
+
+    function clearErrors() {
+        const groups = ['noMr', 'pemohon', 'departemen', 'prioritas'];
+        groups.forEach(id => {
+            const groupEl = document.getElementById(`group-${id}`);
+            const msgEl = document.getElementById(`err-${id}`);
+            if(groupEl && msgEl) {
+                groupEl.classList.remove('has-error');
+                msgEl.innerText = '';
+                msgEl.style.display = 'none';
+            }
+        });
+    }
+
+    async function handleSave(e) {
+        e.preventDefault();
+        clearErrors();
+
+        const payload = {
+            noMr: document.getElementById('noMr').value,
+            pemohon: document.getElementById('pemohon').value,
+            departemen: document.getElementById('departemen').value,
+            prioritas: document.getElementById('prioritas').value,
+            tglRequest: new Date().toISOString().split('T')[0]
+        };
+
+        try {
+            const response = await fetch('/api/pengajuan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                if (errData.invalidParams && Array.isArray(errData.invalidParams)) {
+                    errData.invalidParams.forEach(param => {
+                        const fieldName = param.name;
+                        const errorMsg = param.reason;
+                        const groupEl = document.getElementById(`group-${fieldName}`);
+                        const msgEl = document.getElementById(`err-${fieldName}`);
+                        if (groupEl && msgEl) {
+                            groupEl.classList.add('has-error');
+                            msgEl.innerText = errorMsg;
+                            msgEl.style.display = 'block';
+                        }
+                    });
+                } else {
+                    alert("Terjadi kesalahan tak terduga.");
+                }
+                return;
+            }
+
+            alert("✅ Berhasil disimpan!");
+            closeAddModal();
+            fetchData(currentPage);
+
+        } catch (error) {
+            console.error(error);
+            alert("Gagal koneksi ke server.");
+        }
+    }
+
+    window.onclick = function(event) {
+        const addModal = document.getElementById('addModal');
+        if (event.target == addModal) closeAddModal();
+
+        const detailModal = document.getElementById('detailModal');
+        if (event.target == detailModal) closeDetailModal();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        renderPengajuanView(document.getElementById('dynamicContentArea'));
+        fetchData(0);
+    });
+</script>
+
+</body>
+</html>
